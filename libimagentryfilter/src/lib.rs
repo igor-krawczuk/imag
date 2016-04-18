@@ -37,9 +37,11 @@ extern crate itertools;
 extern crate regex;
 extern crate semver;
 extern crate toml;
+extern crate rhai;
 
 extern crate libimagstore;
 extern crate libimagentrytag;
+extern crate libimagutil;
 
 // core functionality modules of the crate,
 // these depend only on libimagstore
