@@ -35,9 +35,11 @@ addons:
     packages:
     - cmake
     - libcurl4-openssl-dev
+    - libdbus-1-dev
     - libdw-dev
     - libelf-dev
     - libzzip-dev
+    - pkgconfig
     - tree
     sources:
     - kalakris-cmake
