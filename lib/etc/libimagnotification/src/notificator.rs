@@ -17,14 +17,24 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+use result::Result;
+
 /// A Notificator provides a function that can be called to notify about a certain object.
+///
+/// # TODO
+///
+/// The user of the library does _not_ get access to the notification handle.
+/// This is not optimal, but enough for today.
+///
 pub trait Notificator<T> {
-    fn notify(&self, item: &T);
+    fn notify(&self, item: &T) -> Result<()>;
 }
 
 pub mod default {
     use std::fmt::Debug;
     use std::fmt::Display;
+
+    use result::Result;
 
     use notify_rust::Notification as RustNotification;
     use notify_rust::NotificationUrgency;
@@ -67,13 +77,14 @@ pub mod default {
     impl<T: Display> Notificator<T> for Notification {
 
         /// A default implementation for all Types that implement Display
-        fn notify(&self, item: &T) {
+        fn notify(&self, item: &T) -> Result<()> {
             let mut n = RustNotification::new();
             n.appname("imag");
             n.summary(&self.summary);
             n.urgency(self.urgency.clone().into());
             n.body(&format!("{}: {}", &self.message, item));
             let _ = n.finalize().show(); // Ignoring error here
+            Ok(())
         }
 
     }
@@ -90,13 +101,14 @@ pub mod default {
     impl<T: Debug> Notificator<T> for DebugNotification {
 
         /// A default implementation for all Types that implement Display
-        fn notify(&self, item: &T) {
+        fn notify(&self, item: &T) -> Result<()> {
             let mut n = RustNotification::new();
             n.appname("imag");
             n.summary(&self.0.summary);
             n.urgency(self.0.urgency.clone().into());
             n.body(&format!("{}: {:?}", &self.0.message, item));
             let _ = n.finalize().show(); // Ignoring error here
+            Ok(())
         }
 
     }

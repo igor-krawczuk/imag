@@ -17,10 +17,12 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#[macro_use] extern crate custom_derive;
-#[macro_use] extern crate derive_builder;
 extern crate notify_rust;
 
+#[macro_use] extern crate libimagerror;
+
+pub mod error;
 pub mod notificator;
+pub mod result;
 pub mod result_notification;
 

@@ -14,7 +14,6 @@ repository    = "https://github.com/matthiasbeyer/imag"
 homepage      = "http://imag-pim.org"
 
 [dependencies]
-notify-rust = "3.1.1"
-custom_derive = "0.1.7"
-derive_builder = "0.2.1"
+notify-rust = "3.4.2"
 
+libimagerror       = { version = "0.4.0", path = "../../../lib/core/libimagerror" }

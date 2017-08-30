@@ -31,9 +31,12 @@ pub mod err {
     use notify_rust::Notification as RustNotification;
     use notify_rust::NotificationUrgency;
 
+    use error::NotificationErrorKind as NEK;
+    use error::MapErrInto;
     use notificator::default::Urgency;
     use notificator::default::Notification;
     use notificator::Notificator;
+    use result::Result;
 
     #[derive(Debug, Default, Clone)]
     pub struct ErrorNotification(Notification, usize);
@@ -54,21 +57,23 @@ pub mod err {
     impl<T: Error> Notificator<T> for ErrorNotification {
 
         /// A default implementation for all Types that implement Display
-        fn notify(&self, item: &T) {
-            fn trace_notify(urgency: NotificationUrgency, e: &Error, u: usize) {
+        fn notify(&self, item: &T) -> Result<()>{
+            fn trace_notify(urgency: NotificationUrgency, e: &Error, u: usize) -> Result<()> {
                 let mut n = RustNotification::new();
                 n.appname("imag");
                 n.summary("[Error]");
                 n.urgency(urgency.clone());
                 n.body(e.description());
-                n.finalize().show().ok(); // Ignoring error here
+                try!(n.finalize().show().map(|_| ()).map_err_into(NEK::NotificationError));
 
                 if u > 0 {
                     e.cause().map(|cause| trace_notify(urgency, cause, u - 1));
                 }
+
+                Ok(())
             }
 
-            trace_notify(self.0.urgency.clone().into(), item, self.1);
+            trace_notify(self.0.urgency.clone().into(), item, self.1)
         }
 
     }
@@ -98,8 +103,11 @@ pub mod ok {
 
     use notify_rust::Notification as RustNotification;
 
+    use error::MapErrInto;
+    use error::NotificationErrorKind as NEK;
     use notificator::default::Notification;
     use notificator::Notificator;
+    use result::Result;
 
     #[derive(Debug, Default, Clone)]
     pub struct OkNotification(Notification);
@@ -115,13 +123,13 @@ pub mod ok {
     impl<T> Notificator<T> for OkNotification {
 
         /// A default implementation for all Types that implement Display
-        fn notify(&self, _: &T) {
+        fn notify(&self, _: &T) -> Result<()> {
             let mut n = RustNotification::new();
             n.appname("imag");
             n.summary("[Ok]");
             n.urgency(self.0.urgency.clone().into());
             n.body(&"< >".to_owned());
-            n.finalize().show().ok(); // Ignoring error here
+            n.finalize().show().map(|_| ()).map_err_into(NEK::NotificationError)
         }
 
     }
@@ -145,12 +153,26 @@ pub mod ok {
 
 }
 
+/// An extension trait for Result types
+///
+/// Can be used to notify on error or on "Ok(_)" values.
+///
+/// # Warning
+///
+/// As the notification could go wrong, but inside a mapping function, the error cannot be given to
+/// someone, we ignore errors in the Notificator::notify() call.
 pub trait ResultNotification<T, E> {
 
+    /// Notify with a custom Notificator, only notify on Ok(T)
     fn notify_with(self, n: &Notificator<T>) -> Self;
+
+    /// Notify with the OkNotification::default(), only notify on Ok(T)
     fn notify(self) -> Self;
 
+    /// Notify with a custom Notificator, only notify on Err(E)
     fn notify_on_err_with(self, n: &Notificator<E>) -> Self;
+
+    /// Notify with the ErrorNotification::default(), only notify on Err(E)
     fn notify_on_err(self) -> Self;
 
 }
@@ -158,7 +180,7 @@ pub trait ResultNotification<T, E> {
 impl<T, E: Error> ResultNotification<T, E> for Result<T, E> {
 
     fn notify_with(self, n: &Notificator<T>) -> Self {
-        self.map(|item| { n.notify(&item); item })
+        self.map(|item| { let _ = n.notify(&item); item })
     }
 
     fn notify(self) -> Self {
@@ -166,7 +188,7 @@ impl<T, E: Error> ResultNotification<T, E> for Result<T, E> {
     }
 
     fn notify_on_err_with(self, n: &Notificator<E>) -> Self {
-        self.map_err(|e| { n.notify(&e); e })
+        self.map_err(|e| { let _ = n.notify(&e); e })
     }
 
     fn notify_on_err(self) -> Self {
