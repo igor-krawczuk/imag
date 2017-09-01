@@ -17,20 +17,25 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-extern crate chrono;
-extern crate toml;
-extern crate toml_query;
-#[macro_use] extern crate log;
-#[macro_use] extern crate error_chain;
+error_chain! {
+    types {
+        HabitError, HabitErrorKind, ResultExt, Result;
+    }
 
-#[macro_use] extern crate libimagerror;
-extern crate libimagentryedit;
-extern crate libimagstore;
+    links {
+        StoreError(::libimagstore::error::StoreError, ::libimagstore::error::StoreErrorKind);
+    }
 
-pub mod error;
-pub mod habit;
-pub mod instance;
-pub mod iter;
-pub mod result;
-pub mod store;
+    foreign_links {
+        TomlError(::toml_query::error::Error);
+    }
+
+    errors {
+        HabitBuilderMissing(variable_name: &'static str) {
+            description("Habbit builder has not all required information")
+            display("Habit builder misses {}", variable_name)
+        }
+
+    }
+}
 

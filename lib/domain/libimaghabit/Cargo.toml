@@ -14,9 +14,11 @@ repository    = "https://github.com/matthiasbeyer/imag"
 homepage      = "http://imag-pim.org"
 
 [dependencies]
+chrono = "0.4"
 log = "0.3"
 toml = "0.4"
 toml-query = "0.3.0"
+error-chain = "0.10"
 
 libimagstore     = { version = "0.4.0", path = "../../../lib/core/libimagstore" }
 libimagerror     = { version = "0.4.0", path = "../../../lib/core/libimagerror" }

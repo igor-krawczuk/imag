@@ -17,20 +17,20 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-extern crate chrono;
-extern crate toml;
-extern crate toml_query;
-#[macro_use] extern crate log;
-#[macro_use] extern crate error_chain;
+use habit::HabitBuilder;
+use error::Result;
+use iter::HabitStoreIdIterator;
 
-#[macro_use] extern crate libimagerror;
-extern crate libimagentryedit;
-extern crate libimagstore;
+/// Extension trait for libimagstore::store::Store which is basically our Habit-Store
+pub trait HabitStore<'a> {
 
-pub mod error;
-pub mod habit;
-pub mod instance;
-pub mod iter;
-pub mod result;
-pub mod store;
+    /// Create a new habit
+    fn create_habit(&self) -> HabitBuilder {
+        HabitBuilder::default()
+    }
+
+    /// Get an iterator over all habits
+    fn all_habits(&self) -> HabitStoreIdIterator;
+
+}
 
