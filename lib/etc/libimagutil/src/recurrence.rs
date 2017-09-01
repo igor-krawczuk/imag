@@ -17,41 +17,13 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#![deny(
-    dead_code,
-    non_camel_case_types,
-    non_snake_case,
-    path_statements,
-    trivial_numeric_casts,
-    unstable_features,
-    unused_allocation,
-    unused_import_braces,
-    unused_imports,
-    unused_must_use,
-    unused_mut,
-    unused_qualifications,
-    while_true,
-)]
-
-#[macro_use] extern crate lazy_static;
-#[macro_use] extern crate log;
-extern crate regex;
-extern crate url;
-extern crate boolinator;
-extern crate tempfile;
-
-#[macro_use] mod log_result;
-pub mod cli_validators;
-pub mod debug_result;
-pub mod edit;
-pub mod info_result;
-pub mod iter;
-pub mod key_value_split;
-pub mod recurrence;
-pub mod variants;
-pub mod warn_exit;
-pub mod warn_result;
-
-#[cfg(feature = "testing")]
-pub mod testing;
+pub enum Recurrence {
+    Secondly(u64),
+    Minutely(u64),
+    Hourly(u64),
+    Daily(u64),
+    Weekly(u64),
+    Monthly(u64),
+    Yearly(u64),
+}
 
