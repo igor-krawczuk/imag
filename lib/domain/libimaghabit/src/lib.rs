@@ -24,8 +24,10 @@ extern crate toml_query;
 #[macro_use] extern crate error_chain;
 
 #[macro_use] extern crate libimagerror;
+#[macro_use] extern crate libimagstore;
 extern crate libimagentryedit;
-extern crate libimagstore;
+
+module_entry_path_mod!("habit");
 
 pub mod error;
 pub mod habit;

@@ -26,17 +26,42 @@ impl Iterator for HabitStoreIdIterator {
     type Item = StoreId;
 
     fn next(&mut self) -> Option<Self::Item> {
-        unimplemented!()
+        while Some(n) = self.0.next() {
+            if n.is_in_collection("habit") {
+                return Some(n)
+            }
+        }
+        None
     }
 }
 
-pub struct HabitInstanceIterator(StoreIdIterator);
+pub struct HabitTemplateStoreIdIterator(StoreIdIterator);
 
-impl Iterator for HabitInstanceIterator {
+impl Iterator for HabitTemplateStoreIdIterator {
     type Item = StoreId;
 
     fn next(&mut self) -> Option<Self::Item> {
-        unimplemented!()
+        while Some(n) = self.0.next() {
+            if n.is_in_collection("habit/template") {
+                return Some(n)
+            }
+        }
+        None
+    }
+}
+
+pub struct HabitInstanceStoreIdIterator(StoreIdIterator);
+
+impl Iterator for HabitInstanceStoreIdIterator {
+    type Item = StoreId;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while Some(n) = self.0.next() {
+            if n.is_in_collection("habit/instance") {
+                return Some(n)
+            }
+        }
+        None
     }
 }
 

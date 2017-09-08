@@ -29,8 +29,11 @@ use iter::HabitInstanceIterator;
 
 use libimagstore::store::Store;
 use libimagstore::storeid::StoreId;
+use libimagstore::storeid::IntoStoreId;
 use libimagstore::store::Entry;
 use libimagstore::store::FileLockEntry;
+
+const NAIVE_DATE_STRING_FORMAT : &'static str = "%Y-%m-%d";
 
 /// A Habit is a "template" of a habit. A user may define a habit "Eat vegetable".
 /// If the user ate a vegetable, she should create a HabitInstance from the Habit with the
@@ -80,9 +83,9 @@ impl HabitBuilder {
 
         let name      = try!(self.name.ok_or_else(|| mkerr("name")));
         let dateobj   = try!(self.date.ok_or_else(|| mkerr("date")));
-        let date      = try!(date_to_string(&dateobj));
+        let date      = date_to_string(&dateobj);
         let comment   = self.comment.unwrap_or_else(|| String::new());
-        let sid       = try!(build_sid(&dateobj, &name));
+        let sid       = try!(build_habit_template_sid(&name));
         let mut entry = try!(store.create(sid));
 
         try!(entry.get_header_mut().insert("habit.template.name", Value::String(name)));
@@ -104,15 +107,17 @@ impl Default for HabitBuilder {
     }
 }
 
-fn build_sid(date: &NaiveDate, name: &String) -> Result<StoreId> {
-    unimplemented!()
+/// Buld a StoreId for a Habit from a date object and a name of a habit
+fn build_habit_template_sid(name: &String) -> Result<StoreId> {
+    use module_path::ModuleEntryPath;
+    ModuleEntryPath::new(format!("template/{}", name).into_storeid().map_err(From::from)
 }
 
-fn date_to_string(ndt: &NaiveDate) -> Result<String> {
-    unimplemented!()
+fn date_to_string(ndt: &NaiveDate) -> String {
+    ndt.format(NAIVE_DATE_STRING_FORMAT).to_string()
 }
 
 fn date_from_string(s: &str) -> Result<NaiveDate> {
-    unimplemented!()
+    NaiveDate::parse_from_str(s, NAIVE_DATE_STRING_FORMAT).map_err(From::from)
 }
 
